@@ -9,7 +9,8 @@ const UserSchema = new Schema({
     fullName: { type: String, required: false },
     mobile: { type: String, required: true, unique: true },
     otp: { type: OTPSchema },
-    verifiedMobile: { type: Boolean, required: true, default: false }
+    verifiedMobile: { type: Boolean, required: true, default: false },
+    accessToken: { type: String }
 }, {
     // تاریخ ایجاد و آپدیت اشو بهمون میده
     timestamps: true
