@@ -1,11 +1,12 @@
 const {Router} = require('express')
-const authController = require('./auth.controller')
+const userController = require('./user.controller')
+const Authorization = require('../../common/guard/authorization.guard')
 
 const router = Router()
 
-router.get('/whoami', authController.checkOTP)
+router.get('/whoami',Authorization, userController.whoAmI)
 
 module.exports = {
-    AuthRouter: router
+    UserRouter: router
 }
 

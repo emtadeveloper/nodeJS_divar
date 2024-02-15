@@ -1,9 +1,8 @@
-const {AuthMessage} = require('./auth.message')
-const authService = require("./auth.service")
+const {UserMessage} = require('./user.message')
 const NodeEnv = require('../../common/constant/env.enum')
 const autoBind = require("auto-bind");
 const UserModel = require("../user/user.model");
-const UserService = require('../../modules/user/user.service')
+const UserService = require('./user.service')
 
 
 class UserController {
@@ -12,6 +11,15 @@ class UserController {
     constructor() {
         autoBind(this)
         this.#service = UserService
+    }
+
+    async whoAmI(req, res, next) {
+        try {
+            const user = req.user
+            return res.json(user)
+        } catch (error) {
+            next(error)
+        }
     }
 }
 
