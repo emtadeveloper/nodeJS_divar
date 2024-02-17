@@ -17,6 +17,14 @@ CategorySchema.virtual("children", {
 })
 
 
+function autoPopulate(next) {
+    this.populate([{path: 'children'}])
+    next()
+}
+
+CategorySchema.pre("find", autoPopulate).pre("findOne", autoPopulate)
+
+
 const CategoryModel = model("category", CategorySchema)
 module.exports = CategoryModel
 
