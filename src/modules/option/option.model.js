@@ -6,7 +6,7 @@ const OptionSchema = new Schema({
     types: {type: String, enum: ["number", "string", "array", "boolean"]},
     enum: {type: Array, default: []},
     guid: {type: String, required: false},
-    category: {type: Types.objectId, ref: 'Category', required: true}
+    category: {type: Types.ObjectId, ref: 'Category', required: true}
 
 })
 
