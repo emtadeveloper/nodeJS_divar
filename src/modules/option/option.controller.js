@@ -11,6 +11,16 @@ class OptionController {
         this.#service = OptionService
     }
 
+    async removeById(req, res, next) {
+        try {
+            const {id} = req.params
+            await this.#service.removeById(id)
+            return res.json({message: OptionMessage.Deleted})
+        } catch (error) {
+            next(error)
+        }
+    }
+
     async create(req, res, next) {
         try {
             const {title, key, guid, enum: list, type, category} = req.body
@@ -36,6 +46,15 @@ class OptionController {
         const {categoryId} = req.params
         const options = await this.#service.findByCategoryId(categoryId)
         return res.json({options})
+    }
+
+    async findCategorySlug(req, res, next) {
+        try {
+            const {slug} = req.params
+            const option = await this.#service.findByCategorySlug(slug)
+        } catch (error) {
+            next(error)
+        }
     }
 
     async findById(req, res, next) {
