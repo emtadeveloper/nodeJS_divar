@@ -5,18 +5,61 @@ const {StatusCodes, NOT_FOUND} = require("http-status-codes");
 const {OptionMessage} = require("./option.message");
 const {isValidObjectId, Types} = require("mongoose")
 const slugify = require("slugify");
+const CategoryService = require("../category/category.service")
+
 
 class OptionService {
     #model;
+    #categoryService;
 
     constructor() {
         autoBind(this)
         this.#model = OptionModel
+        this.#categoryService = CategoryService
     }
 
     async removeById(id) {
         await this.checkExistById(id)
         return await this.#model.deleteOne({_id: id})
+    }
+
+    async created(optionDTO) {
+        const category = await this.#categoryService.checkExistById(optionDTO.category)
+        optionDTO.category = category._id
+        optionDTO.key = slugify(optionDTO.key, {trim: true, replacement: "_", lower: true})
+        await this.alreadyExistByCategoryAndKey(optionDTO.key, category._id)
+        if (optionDTO?.enum && typeof optionDTO.enum === "string") {
+            optionDTO.enum = optionDTO.enum.split(",")
+        } else if (Array.isArray(optionDTO.enum)) optionDTO.enum = []
+
+        if (isTrue(optionDTO?.required)) optionDTO.required = true
+        if (isFalse(optionDTO?.required)) optionDTO.required = false
+        const option = await this.#model.create(optionDTO)
+        return option
+    }
+
+    async update(id, optionDto) {
+        const existOption = await this.checkExistById(id);
+        if (optionDto.category && isValidObjectId(optionDto.category)) {
+            const category = await this.#categoryService.checkExistById(optionDto.category);
+            optionDto.category = category._id;
+        } else {
+            delete optionDto.category
+        }
+        if (optionDto.slug) {
+            optionDto.key = slugify(optionDto.key, {trim: true, replacement: "_", lower: true});
+            let categoryId = existOption.category;
+            if (optionDto.category) categoryId = optionDto.category;
+            await this.alreadyExistByCategoryAndKey(optionDto.key, categoryId, id)
+        }
+        if (optionDto?.enum && typeof optionDto.enum === "string") {
+            optionDto.enum = optionDto.enum.split(",")
+        } else if (!Array.isArray(optionDto.enum)) delete optionDto.enum;
+
+        if (isTrue(optionDto?.required)) optionDto.required = true;
+        else if (isFalse(optionDto?.required)) optionDto.required = false;
+        else delete optionDto?.required
+        return await this.#model.updateOne({_id: id}, {$set: optionDto})
     }
 
     async find() {
@@ -84,18 +127,6 @@ class OptionService {
                 }
             }
         ])
-    }
-
-    async created(optionDTO) {
-        const category = await this.checkExistById(optionDTO.category)
-        optionDTO.category = category._id
-        optionDTO.key = slugify(optionDTO.key, {trim: true, replacement: "_", lower: true})
-        await this.alreadyExistByCategoryAndKey(optionDTO.key, category._id)
-        if (optionDTO?.enum && typeof optionDTO.enum === "string") {
-            optionDTO.enum = optionDTO.enum.split(",")
-        } else if (Array.isArray(optionDTO.enum)) optionDTO.enum = []
-        const option = await this.#model.create(optionDTO)
-        return option
     }
 
     async checkExistById(id) {

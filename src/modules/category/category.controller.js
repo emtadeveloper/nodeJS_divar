@@ -31,6 +31,18 @@ class CategoryController {
             next(error)
         }
     }
+
+    async remove(req, res, next) {
+        try {
+            const {id} = req.params
+            await this.#service.remove(id)
+            return res.json({
+                message : CategoryMessage.Deleted
+            })
+        } catch (error) {
+
+        }
+    }
 }
 
 module.exports = new CategoryController()

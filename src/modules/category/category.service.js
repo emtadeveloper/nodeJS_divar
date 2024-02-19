@@ -4,13 +4,16 @@ const createHttpError = require("http-errors");
 const {StatusCodes} = require("http-status-codes");
 const {CategoryMessage} = require("./category.message");
 const {isValidObjectId, Types} = require("mongoose")
+const OptionModel = require("../option/option.model")
 const slugify = require("slugify");
 
 class CategoryService {
     #model;
+    #optionModel;
 
     constructor() {
         autoBind(this)
+        this.#optionModel = OptionModel
         this.#model = CategoryModel
     }
 
@@ -19,6 +22,14 @@ class CategoryService {
         // return await this.#model.find({parents: {$exists: false}}).populate([{path: 'children'}])  //
         return await this.#model.find({parents: {$exists: false}}) //
 
+    }
+
+    async remove(id) {
+        await this.checkExistById(id)
+        await this.#optionModel.deleteMany({category: id}).then((async () => {
+            await this.#model.deleteMany({_id: id})
+        }))
+        return true
     }
 
     async created(categoryDTO) {
