@@ -20,7 +20,7 @@ class CategoryService {
     async find() {
         // populate :  اون ویرچوال که در مدل تعریف کردیم رو مییاد و فراخانی میکنه و اجراش میکنه
         // return await this.#model.find({parents: {$exists: false}}).populate([{path: 'children'}])  //
-        return await this.#model.find({parents: {$exists: false}}) //
+        return await this.#model.find({parent: {$exists: false}});
 
     }
 
@@ -46,7 +46,7 @@ class CategoryService {
         }
         if (categoryDTO?.slug) {
             categoryDTO.slug = slugify(categoryDTO.slug)
-            await this.alreadyExistBySlug((categoryDTO.slug))
+            await this.alreadyExistBySlug(categoryDTO.slug)
         } else {
             categoryDTO.slug = slugify(categoryDTO.name)
         }
@@ -56,12 +56,6 @@ class CategoryService {
 
     async checkExistById(id) {
         const category = await this.#model.findById(id)
-        if (!category) throw  new createHttpError(StatusCodes.NOTFOUND, CategoryMessage.NotFound)
-        return category
-    }
-
-    async checkExistBySlug(slug) {
-        const category = await this.#model.findById(slug)
         if (!category) throw  new createHttpError(StatusCodes.NOTFOUND, CategoryMessage.NotFound)
         return category
     }

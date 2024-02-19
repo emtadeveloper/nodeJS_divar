@@ -91,6 +91,9 @@
  *      summary: updated option by id
  *      tags:
  *          -   Option
+ *      parameters:
+ *          -   in: path
+ *              name: id
  *      requestBody:
  *          content:
  *              application/x-www-form-urlencoded:

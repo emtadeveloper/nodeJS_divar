@@ -23,8 +23,8 @@ class OptionController {
 
     async create(req, res, next) {
         try {
-            const {title, key, guid, enum: list, type, category, required} = req.body
-            await this.#service.create({title, key, guid, enum: list, required, type, category})
+            const {title, key, guid, enum: list, type, category, required} = req.body;
+            await this.#service.create({title, key, guid, enum: list, type, category, required})
             return res.status(StatusCodes.CREATED).json({
                 message: OptionMessage.Created
             })
@@ -56,15 +56,21 @@ class OptionController {
     }
 
     async findByCategoryById(req, res, next) {
-        const {categoryId} = req.params
-        const options = await this.#service.findByCategoryId(categoryId)
-        return res.json({options})
+        try {
+            const {categoryId} = req.params
+            console.log(categoryId)
+            const options = await this.#service.findByCategoryId(categoryId)
+            return res.json({options})
+        } catch (error) {
+            next(error)
+        }
     }
 
     async findCategorySlug(req, res, next) {
         try {
-            const {slug} = req.params
-            const option = await this.#service.findByCategorySlug(slug)
+            const {slug} = req.params;
+            const options = await this.#service.findByCategorySlug(slug);
+            return res.json(options)
         } catch (error) {
             next(error)
         }
