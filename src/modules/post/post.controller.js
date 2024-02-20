@@ -3,6 +3,8 @@ const CategoryModel = require("../category/category.model")
 const PostService = require("./post.service");
 const {PostMessage} = require("./post.message");
 const {StatusCodes} = require('http-status-codes')
+const createHttpError = require("http-errors");
+const {OptionMessage} = require("../option/option.message");
 
 class PostController {
     #service;
@@ -14,16 +16,25 @@ class PostController {
 
     async createPostPage(req, res, next) {
         try {
-            const {slug} = req.query
-            let match = { parent:null}
-            let categories =[]
-            const categories = await CategoryModel.aggregate([{$match: {parent: null}}])
-            console.log(categories)
+            let {slug} = req.query
+            let match = {parent: null}
+            let showBack =false
+            if (slug) {
+                slug = slug.trim()
+                const category = await CategoryModel.findOne({slug})
+                if (!category) throw new createHttpError(StatusCodes.NOT_FOUND, PostMessage.NotFound)
+                showBack =true
+                match = {
+                    parent: category._id
+                }
+            } else {
+            }
+            const categories = await CategoryModel.aggregate([{$match: match}])
             res.render("./pages/panel/create-post.ejs", {
                 options: [],
                 categories,
                 category: 'yourCategoryValue',
-                showBack: true
+                showBack
             })
         } catch (error) {
             next(error)
