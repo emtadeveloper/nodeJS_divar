@@ -11,3 +11,6 @@ const PostSchema = new Schema({
     coordinate: {type: [Number], required: true}, // 52.44864866   25.54646546
     images: {type: [String], required: false, default: []}
 })
+
+const PostModel = model("post", PostSchema)
+module.exports = PostModel

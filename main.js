@@ -20,7 +20,9 @@ async function main() {
     //   معرفی همه جاهایی که فایل های استاتیک ما در آن جا قرار دارد
     app.use(express.static("public"))
     app.set("view engine", "ejs")
-    app.set("layouts", "./layouts/panel/main.ejs")
+    app.set("layout", "./layouts/panel/main.ejs")
+    app.set("layout extractScripts", true);
+    app.set("layout extractStyles", true);
     app.use(expressEjsLayouts)
     app.use(mainRouter)
     swaggerConfig(app)
