@@ -17,18 +17,9 @@ class PostService {
         this.#model = PostModel
     }
 
-    async find() {
-    }
-
-    async remove(id) {
-    }
-
-    async created(postDTO) {
-
-    }
-
-    async checkExistById(id) {
-
+    async getCategoryOptions(categoryId) {
+        const options = await this.#optionModel.find({category: categoryId})
+        return options
     }
 }
 

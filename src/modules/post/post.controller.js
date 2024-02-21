@@ -18,12 +18,16 @@ class PostController {
         try {
             let {slug} = req.query
             let match = {parent: null}
-            let showBack =false
+            let showBack = false
+            let options
             if (slug) {
                 slug = slug.trim()
                 const category = await CategoryModel.findOne({slug})
                 if (!category) throw new createHttpError(StatusCodes.NOT_FOUND, PostMessage.NotFound)
-                showBack =true
+                options = await this.#service.getCategoryOptions(category.id)
+                if(options.length ===0) options = null
+                showBack = true
+
                 match = {
                     parent: category._id
                 }
@@ -31,7 +35,7 @@ class PostController {
             }
             const categories = await CategoryModel.aggregate([{$match: match}])
             res.render("./pages/panel/create-post.ejs", {
-                options: [],
+                options,
                 categories,
                 category: 'yourCategoryValue',
                 showBack
