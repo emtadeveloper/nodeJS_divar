@@ -3,7 +3,9 @@ const PostMessage = Object.freeze({
     NotFound: "category notFound",
     AlreadyExist: 'category already exist',
     Deleted: "category deleted successfully",
-    Updated: 'category updated successfully'
+    Updated: 'category updated successfully',
+    WrongFormat: "format of pictures are wrong!",
+    RequestNotValid: "request not valid"
 })
 
 module.exports = {

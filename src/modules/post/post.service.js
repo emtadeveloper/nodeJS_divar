@@ -17,6 +17,16 @@ class PostService {
         this.#model = PostModel
     }
 
+    async create(dto) {
+        const DTO = await this.#model.create(dto)
+        return DTO
+    }
+
+    async find(userId) {
+        if (userId && isValidObjectId(userId)) return await this.#model.find({userId})
+        throw new createHttpError(StatusCodes.BAD_REQUEST, PostMessage.RequestNotValid)
+    }
+
     async getCategoryOptions(categoryId) {
         const options = await this.#optionModel.find({category: categoryId})
         return options

@@ -5,6 +5,11 @@ const {PostMessage} = require("./post.message");
 const {StatusCodes} = require('http-status-codes')
 const createHttpError = require("http-errors");
 const {OptionMessage} = require("../option/option.message");
+const {Types} = require("mongoose");
+const axios = require("axios");
+const {getAddresssDetail} = require("../../common/utils/http");
+const {removePropertyInObject} = require("../../common/utils/function");
+const {decode} = require("utf8");
 
 class PostController {
     #service;
@@ -20,12 +25,12 @@ class PostController {
             let match = {parent: null}
             let showBack = false
             let options
+            const category = await CategoryModel.findOne({slug})
             if (slug) {
                 slug = slug.trim()
-                const category = await CategoryModel.findOne({slug})
                 if (!category) throw new createHttpError(StatusCodes.NOT_FOUND, PostMessage.NotFound)
                 options = await this.#service.getCategoryOptions(category.id)
-                if(options.length ===0) options = null
+                if (options.length === 0) options = null
                 showBack = true
 
                 match = {
@@ -37,7 +42,7 @@ class PostController {
             res.render("./pages/panel/create-post.ejs", {
                 options,
                 categories,
-                category: 'yourCategoryValue',
+                category: category?._id.toString(),
                 showBack
             })
         } catch (error) {
@@ -47,15 +52,36 @@ class PostController {
 
     async create(req, res, next) {
         try {
+            const images = req?.files?.map(image => image?.path?.slice(7))
+            const {title_post: title, description: content, lat, lng, category} = req.body
+            const {address, city, district, province} = await getAddresssDetail(lat, lng)
+            const options = removePropertyInObject(req.body, ['images', 'category', 'title_post', 'description', 'lat', 'lng']);
+            for (let key in options) {
+                let value = options[key]
+                delete options[key]
+                key = decode(key)
+                options[key] = value
 
+            }
+            await this.#service.create({
+                title,
+                content,
+                coordinates: [lat, lng],
+                category: new Types.ObjectId(category),
+                images,
+                options, address, city, district, province
+            })
+            return res.status(StatusCodes.CREATED).json({message: PostMessage.Created})
         } catch (error) {
             next(error)
         }
     }
 
-    async find(req, res, next) {
+    async findMyPosts(req, res, next) {
         try {
-
+            const userId = req.user._id
+            const posts = await this.#service.find(userId)
+            return res.render("./pages/panel/posts.ejs", {posts , count:posts.length})
         } catch (error) {
             next(error)
         }

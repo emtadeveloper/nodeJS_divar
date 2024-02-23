@@ -7,6 +7,7 @@ const AllExceptionHandler = require('./src/common/exception/all-exception.handle
 const bodyParser = require('body-parser')
 const cookieParser = require("cookie-parser")
 const expressEjsLayouts = require("express-ejs-layouts")
+const moment = require("jalali-moment");
 
 dotenv.config()
 
@@ -25,6 +26,8 @@ async function main() {
     app.set("layout extractStyles", true);
     app.use(expressEjsLayouts)
     app.use(mainRouter)
+    // با استفاده از آن میتوانیم یکسری فایل ها یا پراپرتی هایی رو ست کنیم که در داخل فایل های ejs امون بهش دسترسی داشته باشیم
+    app.locals.moment = moment
     swaggerConfig(app)
     NotFoundHandler(app)
     AllExceptionHandler(app)
