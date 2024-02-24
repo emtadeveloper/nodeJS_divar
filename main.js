@@ -6,6 +6,7 @@ const NotFoundHandler = require('./src/common/exception/not-found.handler')
 const AllExceptionHandler = require('./src/common/exception/all-exception.handler')
 const bodyParser = require('body-parser')
 const cookieParser = require("cookie-parser")
+const methodOverrode = require('method-override')
 const expressEjsLayouts = require("express-ejs-layouts")
 const moment = require("jalali-moment");
 
@@ -17,6 +18,7 @@ async function main() {
     app.use(bodyParser.urlencoded({extended: false}))
     app.use(bodyParser.json())
     app.use(cookieParser(process.env.COOKIE_SECRET_KEY))
+    app.use(methodOverrode("_method"))
     require('./src/config/mongoose.config')
     //   معرفی همه جاهایی که فایل های استاتیک ما در آن جا قرار دارد
     app.use(express.static("public"))

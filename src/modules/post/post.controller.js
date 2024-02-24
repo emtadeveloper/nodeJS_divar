@@ -89,6 +89,9 @@ class PostController {
 
     async remove(req, res, next) {
         try {
+            const {id} = req.params
+            await this.#service.remove(id)
+            const posts = await this.#service.find(id)
         } catch (error) {
 
         }
